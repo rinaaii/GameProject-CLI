@@ -112,6 +112,6 @@ See `Scenarios/genshin-api-mode.txt` for a walkthrough. The HTTP client accepts 
 
 Startup modes: `dotnet run --project GameProject -- --chars`, `--text`, or `--game`. Without an option, the application asks the user to select a mode.
 
-Character catalogue: `ls char`, `show <id/name>`, `create char`, `api sync`, `api chars`, `api create <name>`. Locally created Warrior/Mage characters are stored in `data/characters.json`. Genshin character graphic links are printed by `show`.
+Character catalogue: `ls char`, `show <id/name>`, `create char`, `api sync`, `api chars`, `api create <name>`. Locally created Warrior/Mage characters and API-imported Genshin characters (including equipped item bonuses) are stored in `data/characters.json`. Genshin character graphic links are printed by `show`.
 
-Text game: `game characters`, `game start <player-id/name> [opponent-id/name]`, `game status`, `game save`, `game load`, `game results`. During the turn loop use `attack`, `ability`, `status`, `save`, or `quit`. Game state and completed results are stored in `data/game-save.json` and `data/game-results.json`.
+Text game: `game characters`, `game start <player-id/name> [opponent-id/name]`, `game status`, `game history`, `game save`, `game load`, `game results`. During the turn loop use `attack`, `ability`, `status`, `history`, `save`, or `quit`. The save stores current HP, turn number, action history, imported character data, and equipment bonuses; completed results are stored in `data/game-results.json`.

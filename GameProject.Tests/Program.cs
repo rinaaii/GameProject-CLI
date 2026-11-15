@@ -29,7 +29,9 @@ var tests = new (string Name, Action Run)[]
     ("Command registry executes known commands only", CommandRegistryExecution),
     ("Genshin HTTP client parses remote catalogue and character", GenshinApiParsing),
     ("Genshin character maps remote data into internal model", GenshinCharacterMapping),
-    ("Game session starts, advances turns, and restores saved state", GameSessionSaveAndLoad)
+    ("Game session starts, advances turns, and restores saved state", GameSessionSaveAndLoad),
+    ("Game session persists action history, imported character data, and equipment", GameSessionPersistsHistoryAndImportedCharacter),
+    ("Character catalogue persists imported Genshin characters", GenshinCharacterCatalogPersistence)
 };
 
 var failed = 0;
@@ -158,6 +160,58 @@ static void GenshinCharacterMapping()
     Assert(mapped.RemoteAbilities.Count == 1);
 }
 
+static void GameSessionSaveAndLoad()
+{
+    var first = new GameSessionService();
+    first.Start(new Warrior("Test Hero"));
+    first.PlayerAttack();
+    Equal(1, first.Turn);
+    var second = new GameSessionService();
+    second.Load();
+    Equal(1, second.Turn);
+    Equal("Test Hero", second.Player.Name);
+    Equal("Training Dummy", second.Enemy.Name);
+    Assert(second.Player.Health < second.Player.MaxHealth);
+    Assert(second.History.Count >= 3, "Start, player action and counterattack should be recorded.");
+}
+static void GameSessionPersistsHistoryAndImportedCharacter()
+{
+    var remote = new RemoteCharacter("Amber", "Scout", 4, "Pyro", "Bow", new[] { new RemoteAbility("Sharpshooter", "A shot.") });
+    var hero = new GenshinCharacter(remote);
+    hero.EquipItem(new Item("Bow", 0, 8));
+    var first = new GameSessionService();
+    first.Start(hero);
+    first.PlayerAttack();
+    var expectedAttack = first.Player.TotalAttack;
+    var expectedHistoryCount = first.History.Count;
+
+    var second = new GameSessionService();
+    second.Load();
+    Assert(second.Player is GenshinCharacter, "Imported Genshin character type should survive loading.");
+    Equal(expectedAttack, second.Player.TotalAttack);
+    Equal(expectedHistoryCount, second.History.Count);
+    Assert(second.History.Any(x => x.Contains("attacked", StringComparison.OrdinalIgnoreCase)));
+}
+
+static void GenshinCharacterCatalogPersistence()
+{
+    var source = new RemoteCharacter("Amber", "Scout", 4, "Pyro", "Bow", new[] { new RemoteAbility("Sharpshooter", "A shot.") });
+    var original = new CharacterStore();
+    var imported = new GenshinCharacter(source);
+    imported.EquipItem(new Item("Bow", 0, 8));
+    original.AddCharacter("char1", imported);
+    CharacterCatalogPersistence.SaveUserCharacters(original);
+
+    var restored = new CharacterStore();
+    CharacterCatalogPersistence.LoadInto(restored);
+    var restoredCharacter = restored.GetCharacter("char1").Character;
+    Assert(restoredCharacter is GenshinCharacter);
+    Equal("Pyro", ((GenshinCharacter)restoredCharacter).Element);
+    Equal(imported.TotalAttack, restoredCharacter.TotalAttack);
+    Equal("char2", restored.AddCharacter(null, new Warrior("Second hero")).Id);
+}
+
+
 sealed class FakeApiHandler : HttpMessageHandler
 {
     protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
@@ -172,18 +226,4 @@ sealed class FakeApiHandler : HttpMessageHandler
         };
         return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(json, Encoding.UTF8, "application/json") });
     }
-}
-
-static void GameSessionSaveAndLoad()
-{
-    var first = new GameSessionService();
-    first.Start(new Warrior("Test Hero"));
-    first.PlayerAttack();
-    Equal(1, first.Turn);
-    var second = new GameSessionService();
-    second.Load();
-    Equal(1, second.Turn);
-    Equal("Test Hero", second.Player.Name);
-    Equal("Training Dummy", second.Enemy.Name);
-    Assert(second.Player.Health < second.Player.MaxHealth);
 }

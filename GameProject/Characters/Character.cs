@@ -17,6 +17,7 @@ public abstract class Character
     public int MaxHealth => _maxHealth;
     public int TotalAttack => _baseAttack + (_equippedItem?.AttackBonus ?? 0);
     public int TotalArmor => _baseArmor + (_equippedItem?.ArmorBonus ?? 0);
+    public IItem? EquippedItem => _equippedItem;
 
     public Character(string name, int maxHealth, int baseArmor, int baseAttack)
     {
@@ -66,4 +67,5 @@ public abstract class Character
     }
 
     public abstract void UseAbility(Character target);
+    public abstract Character CreateFreshCopy();
 }

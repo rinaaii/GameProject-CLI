@@ -6,7 +6,7 @@ internal static class GameCommands
 {
     public static void Execute(string[] args, CommandContext context)
     {
-        if (args.Length == 0) throw new ArgumentException("Usage: game <characters|start|status|save|load|results>");
+        if (args.Length == 0) throw new ArgumentException("Usage: game <characters|start|status|history|save|load|results>");
         switch (args[0].ToLowerInvariant())
         {
             case "characters":
@@ -20,14 +20,15 @@ internal static class GameCommands
                 var enemy = args.Length >= 3 ? context.Characters.GetCharacter(args[2]).Character : null;
                 context.Game.Start(player, enemy);
                 Console.WriteLine($"Game started: {context.Game.Player.Name} vs {context.Game.Enemy.Name}.");
-                Console.WriteLine("Turn commands: attack, ability, status, save, quit");
+                Console.WriteLine("Turn commands: attack, ability, status, history, save, quit");
                 RunTurnLoop(context.Game);
                 break;
             case "status": context.Game.ShowStatus(); break;
+            case "history": context.Game.ShowHistory(); break;
             case "save": context.Game.Save(); Console.WriteLine("Game state saved."); break;
             case "load": context.Game.Load(); Console.WriteLine("Saved game loaded."); context.Game.ShowStatus(); RunTurnLoop(context.Game); break;
             case "results": context.Game.ShowResults(); break;
-            default: throw new ArgumentException("Use game characters, start, status, save, load, or results.");
+            default: throw new ArgumentException("Use game characters, start, status, history, save, load, or results.");
         }
     }
     private static void RunTurnLoop(GameSessionService game)
@@ -40,9 +41,10 @@ internal static class GameCommands
                 case "attack": game.PlayerAttack(); break;
                 case "ability": game.PlayerAbility(); break;
                 case "status": game.ShowStatus(); break;
+                case "history": game.ShowHistory(); break;
                 case "save": game.Save(); Console.WriteLine("Saved."); break;
                 case "quit": Console.WriteLine("Game paused. Use 'game load' to continue."); return;
-                default: Console.WriteLine("Commands: attack, ability, status, save, quit"); break;
+                default: Console.WriteLine("Commands: attack, ability, status, history, save, quit"); break;
             }
         }
     }

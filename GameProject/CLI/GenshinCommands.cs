@@ -36,6 +36,7 @@ internal sealed class GenshinCommands(GenshinApiClient api)
                 var remote = api.GetCharacterAsync(name).GetAwaiter().GetResult();
                 var character = new GenshinCharacter(remote);
                 var record = context.Characters.AddCharacter(null, character);
+                GameProject.Gameplay.CharacterCatalogPersistence.SaveUserCharacters(context.Characters);
                 Console.WriteLine($"Imported [{record.Id}] {remote.Name} ({remote.Element}, {remote.Rarity}★).");
                 Console.WriteLine(BuildCharacterDocument(character).Render());
                 break;
@@ -50,6 +51,7 @@ internal sealed class GenshinCommands(GenshinApiClient api)
                 var item = new Item(remote.Name, 0, Math.Max(0, remote.BaseAttack - 40) + Math.Max(0, remote.Rarity - 1) * 2);
                 var itemRecord = context.Characters.AddItem($"genshin-{Slug(remote.Name)}", item);
                 character.Items.Add(item); character.Character.EquipItem(item);
+                GameProject.Gameplay.CharacterCatalogPersistence.SaveUserCharacters(context.Characters);
                 Console.WriteLine($"Imported and equipped [{itemRecord.Id}] {remote.Name} (base ATK {remote.BaseAttack}, rarity {remote.Rarity}★).");
                 break;
             }

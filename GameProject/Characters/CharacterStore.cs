@@ -24,7 +24,22 @@ public sealed class CharacterStore : ICharacterStore
     public IEnumerable<ItemRecord> Items => _items.Values;
     public IEnumerable<AbilityRecord> Abilities => _abilities.Values;
 
-    public string NewId(string prefix) => $"{prefix}{_nextId++}";
+    public string NewId(string prefix)
+    {
+        string candidate;
+        do
+        {
+            candidate = $"{prefix}{_nextId++}";
+        }
+        while (prefix.ToLowerInvariant() switch
+        {
+            "char" => _characters.ContainsKey(candidate),
+            "item" => _items.ContainsKey(candidate),
+            "ability" => _abilities.ContainsKey(candidate),
+            _ => false
+        });
+        return candidate;
+    }
     public CharacterRecord AddCharacter(string? id, Character character)
     {
         id = string.IsNullOrWhiteSpace(id) ? NewId("char") : id;

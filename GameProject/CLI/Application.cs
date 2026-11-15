@@ -90,7 +90,7 @@ public sealed class Application
 
     private static void RegisterGameCommands(CommandRegistry r, CommandContext c)
     {
-        r.Add("game", "game <characters|start|status|save|load|results> — text game operations", (a, _) => GameCommands.Execute(a, c));
+        r.Add("game", "game <characters|start|status|history|save|load|results> — text game operations", (a, _) => GameCommands.Execute(a, c));
     }
 
     private static void RegisterTextCommands(CommandRegistry r, CommandContext c)

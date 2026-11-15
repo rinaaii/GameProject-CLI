@@ -1,0 +1,19 @@
+# Remote Genshin API workflow (run: dotnet run --project GameProject -- --chars)
+# 1. Download the catalogue names from https://genshin.jmp.blue
+api sync
+
+# 2. Browse remote characters and weapons
+api chars
+api weapons
+
+# 3. Import a remote character into the local game model (example name may vary)
+api create "Amber"
+ls char
+
+# 4. Import a weapon and equip it on the virtual character
+api equip char1 "Beginner's Protector"
+
+# 5. Print the character state as structured text
+api show char1
+
+exit

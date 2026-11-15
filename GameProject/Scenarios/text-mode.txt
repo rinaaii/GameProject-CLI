@@ -1,0 +1,21 @@
+Сценарій 1. Створення структурованого документа
+
+Запуск:
+  dotnet run -- --text
+
+Команди в інтерпретаторі:
+  add container heading
+  Element name: Introduction
+  add leaf paragraph
+  Element name: Welcome
+  Paragraph text: This is the first paragraph.
+  pwd
+  print --whole --id
+  cd --id text1
+  pwd
+  up
+  rm Introduction
+  y
+  exit
+
+Примітка: команда add переходить у діалог і запитує поля в консолі.

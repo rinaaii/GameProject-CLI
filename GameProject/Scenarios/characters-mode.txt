@@ -1,0 +1,34 @@
+Сценарій 2. Персонажі, предмети та здібності
+
+Запуск:
+  dotnet run -- --chars
+
+Команди в інтерпретаторі:
+  create char
+  Character name: Arthur
+  Character type (warrior/mage): warrior
+  Identifier (leave blank for automatic): arthur
+  create char
+  Character name: Merlin
+  Character type (warrior/mage): mage
+  Identifier (leave blank for automatic): merlin
+  create item
+  Item name: Training Sword
+  Armor bonus: 0
+  Attack bonus: 5
+  Identifier (leave blank for automatic): sword
+  add item sword --char_id arthur
+  create ability
+  Ability name: Spark
+  Effect (damage/heal): damage
+  Power: 12
+  Identifier (leave blank for automatic): spark
+  add ability spark --char_id merlin --id fire
+  act attack arthur merlin
+  act ability merlin arthur --id fire
+  ls char
+  ls item
+  ls ability
+  exit
+
+Примітка: якщо обраний ID уже зайнятий у відповідній колекції, програма повідомить про помилку.
